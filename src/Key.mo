@@ -1,14 +1,11 @@
 import Result "mo:new-base/Result";
-import Nat "mo:new-base/Nat";
 import Iter "mo:new-base/Iter";
 import Blob "mo:new-base/Blob";
-import Runtime "mo:new-base/Runtime";
 import Text "mo:new-base/Text";
 import Nat8 "mo:new-base/Nat8";
-import Array "mo:new-base/Array";
 import Buffer "mo:base/Buffer";
-import BaseX "mo:base-x-encoder";
-import VarInt "VarInt";
+import MultiCodec "mo:multiformats/MultiCodec";
+import MultiBase "mo:multiformats/MultiBase";
 
 module {
 
@@ -44,30 +41,25 @@ module {
     /// let text = Key.toText(didKey);
     /// // Returns: "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
     /// ```
-    public func toText(did : DID) : Text {
-        // Validate key length
-        let expectedLength = getKeyLength(did.keyType);
-        if (did.publicKey.size() != expectedLength) {
-            Runtime.trap("Invalid key length for " # debug_show (did.keyType) # ": expected " # Nat.toText(expectedLength) # ", got " # Nat.toText(did.publicKey.size()));
-        };
+    public func toText(did : DID, multibase : MultiBase.MultiBase) : Text {
 
         let buffer = Buffer.Buffer<Nat8>(did.publicKey.size() + 5);
 
-        // Add multicodec prefix for key type
-        let codecBytes = VarInt.encode(keyTypeToCode(did.keyType));
-        for (byte in codecBytes.vals()) {
-            buffer.add(byte);
+        let codec = switch (did.keyType) {
+            case (#ed25519) #ed25519_pub;
+            case (#secp256k1) #secp256k1_pub;
+            case (#p256) #p256_pub;
         };
-
+        // Add multicodec prefix
+        MultiCodec.toBytesBuffer(buffer, codec);
         // Add public key bytes
         for (byte in did.publicKey.vals()) {
             buffer.add(byte);
         };
+        // Convert to multibase (base58btc) text
+        let base58Key = MultiBase.toText(buffer.vals(), #base58btc);
 
-        let multicodecKey = Buffer.toArray(buffer);
-        let base58Key = BaseX.toBase58(multicodecKey.vals());
-
-        "did:key:z" # base58Key;
+        "did:key:" # base58Key;
     };
 
     /// Parses a did:key text string into a DID structure.
@@ -80,38 +72,34 @@ module {
     /// };
     /// ```
     public func fromText(text : Text) : Result.Result<DID, Text> {
-        // Check format: did:key:z...
-        if (not Text.startsWith(text, #text "did:key:z")) {
-            return #err("Invalid did:key format: must start with 'did:key:z'");
+
+        // Extract the base58 part (everything after "did:key:")
+        let base58Part = switch (Text.stripStart(text, #text "did:key:")) {
+            case (?v) v;
+            case (null) return #err("Invalid format: must start with 'did:key:'");
         };
 
-        // Extract the base58 part (everything after "did:key:z")
-        let base58Part = Text.stripStart(text, #text "did:key:z");
-        if (base58Part == "") {
-            return #err("Invalid did:key: empty identifier");
+        let (bytes, _) = switch (MultiBase.fromText(base58Part)) {
+            case (#ok((bytes, multibase))) (bytes, multibase);
+            case (#err(e)) return #err("Failed to decode multibase: " # e);
         };
 
-        // Decode base58
-        let multicodecKey = switch (BaseX.fromBase58(base58Part)) {
-            case (#ok(bytes)) bytes;
-            case (#err(e)) return #err("Failed to decode base58: " # e);
+        let bytesIter = bytes.vals();
+
+        let codec = switch (MultiCodec.fromBytes(bytesIter)) {
+            case (#ok(codec)) codec;
+            case (#err(e)) return #err("Failed to decode multicodec: " # e);
         };
 
-        if (multicodecKey.size() < 2) {
-            return #err("Invalid did:key: insufficient bytes");
+        let keyType = switch (codec) {
+            case (#ed25519_pub) #ed25519;
+            case (#secp256k1_pub) #secp256k1;
+            case (#p256_pub) #p256;
+            case (_) return #err("Unsupported key type in multicodec: " # debug_show (codec));
         };
-
-        // Decode multicodec prefix
-        let iter = Iter.fromArray(multicodecKey);
-        let ?codecCode = VarInt.decode(iter) else return #err("Failed to decode multicodec prefix");
-        let ?keyType = codeToKeyType(codecCode) else return #err("Unsupported key type: " # Nat.toText(codecCode));
 
         // Extract public key bytes
-        let publicKeyBytes = Iter.toArray(iter);
-        let expectedLength = getKeyLength(keyType);
-        if (publicKeyBytes.size() != expectedLength) {
-            return #err("Invalid key length for " # debug_show (keyType) # ": expected " # Nat.toText(expectedLength) # ", got " # Nat.toText(publicKeyBytes.size()));
-        };
+        let publicKeyBytes = Iter.toArray<Nat8>(bytesIter);
 
         #ok({
             keyType = keyType;
@@ -130,68 +118,11 @@ module {
     /// };
     /// ```
     public func fromPublicKey(keyType : KeyType, publicKey : Blob) : Result.Result<DID, Text> {
-        let expectedLength = getKeyLength(keyType);
-        if (publicKey.size() != expectedLength) {
-            return #err("Invalid key length for " # debug_show (keyType) # ": expected " # Nat.toText(expectedLength) # ", got " # Nat.toText(publicKey.size()));
-        };
 
         #ok({
             keyType = keyType;
             publicKey = publicKey;
         });
-    };
-
-    /// Checks if two did:key DIDs are equal.
-    ///
-    /// ```motoko
-    /// let did1 = { keyType = #ed25519; publicKey = "..."; };
-    /// let did2 = { keyType = #ed25519; publicKey = "..."; };
-    /// let isEqual = Key.equal(did1, did2);
-    /// ```
-    public func equal(did1 : DID, did2 : DID) : Bool {
-        did1.keyType == did2.keyType and did1.publicKey == did2.publicKey;
-    };
-
-    /// Gets the expected byte length for a given key type.
-    ///
-    /// ```motoko
-    /// let length = Key.getKeyLength(#ed25519);
-    /// // Returns: 32
-    /// ```
-    public func getPublicKeyLengths(keyType : KeyType) : [Nat] {
-        switch (keyType) {
-            case (#ed25519) [32];
-            case (#secp256k1) [33, 65];
-            case (#p256) [33, 65];
-        };
-    };
-
-    /// Validates that a public key has the correct length for its type.
-    ///
-    /// ```motoko
-    /// let isValid = Key.isValidKeyLength(#ed25519, publicKeyBytes);
-    /// ```
-    public func isValidKeyLength(keyType : KeyType, publicKey : Blob) : Bool {
-        publicKey.size() == getPublicKeyLengths(keyType);
-    };
-
-    // Convert key type to multicodec code
-    private func keyTypeToCode(keyType : KeyType) : Nat {
-        switch (keyType) {
-            case (#ed25519) 0xed;
-            case (#secp256k1) 0xe7;
-            case (#p256) 0x1200;
-        };
-    };
-
-    // Convert multicodec code to key type
-    private func codeToKeyType(code : Nat) : ?KeyType {
-        switch (code) {
-            case (0xed) ?#ed25519;
-            case (0xe7) ?#secp256k1;
-            case (0x1200) ?#p256;
-            case (_) null;
-        };
     };
 
 };
