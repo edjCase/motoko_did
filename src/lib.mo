@@ -3,7 +3,7 @@ import Text "mo:new-base/Text";
 import Iter "mo:new-base/Iter";
 import Array "mo:new-base/Array";
 import Key "Key";
-import PLC "PLC";
+import Plc "Plc";
 import Web "Web";
 
 module {
@@ -25,7 +25,7 @@ module {
     /// ```
     public type DID = {
         #key : Key.DID;
-        #plc : PLC.DID;
+        #plc : Plc.DID;
         #web : Web.DID;
     };
 
@@ -41,8 +41,8 @@ module {
     /// ```
     public func toText(did : DID) : Text {
         switch (did) {
-            case (#key(keyDid)) Key.toText(keyDid);
-            case (#plc(plcDid)) PLC.toText(plcDid);
+            case (#key(keyDid)) Key.toText(keyDid, #base58btc);
+            case (#plc(plcDid)) Plc.toText(plcDid);
             case (#web(webDid)) Web.toText(webDid);
         };
     };
@@ -82,8 +82,8 @@ module {
             };
             case ("plc") {
                 Result.chain(
-                    PLC.fromText(fullIdentifier),
-                    func(plcDid : PLC.DID) : Result.Result<DID, Text> = #ok(#plc(plcDid)),
+                    Plc.fromText(fullIdentifier),
+                    func(plcDid : Plc.DID) : Result.Result<DID, Text> = #ok(#plc(plcDid)),
                 );
             };
             case ("web") {
@@ -109,7 +109,7 @@ module {
     public func equal(did1 : DID, did2 : DID) : Bool {
         switch (did1, did2) {
             case (#key(k1), #key(k2)) Key.equal(k1, k2);
-            case (#plc(p1), #plc(p2)) PLC.equal(p1, p2);
+            case (#plc(p1), #plc(p2)) Plc.equal(p1, p2);
             case (#web(w1), #web(w2)) Web.equal(w1, w2);
             case (_, _) false;
         };

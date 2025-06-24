@@ -10,6 +10,10 @@ license = "MIT"
 base = "0.14.13"
 new-base = "0.4.0"
 multiformats = "0.0.3"
+url-kit = "0.0.6"
 
 [dev-dependencies]
 test = "2.1.1"
+
+[toolchain]
+moc = "0.14.10"
