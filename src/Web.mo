@@ -27,7 +27,7 @@ module {
 
     public type Host = {
         #domain : Domain.Domain;
-        #localhost;
+        #hostname : Text;
     };
 
     /// Converts a did:web to its text representation.
@@ -76,7 +76,7 @@ module {
         let encodedDomain = partsArray[0] |> Text.replace(_, #text("%3A"), ":"); // Decode encoded colons
         let (host, port) : (Host, ?Nat16) = switch (Host.fromText(encodedDomain)) {
             case (#ok((#domain(domain), port))) (#domain(domain), port);
-            case (#ok((#localhost, port))) (#localhost, port);
+            case (#ok((#hostname(hostname), port))) (#hostname(hostname), port);
             case (#ok((#ipV4(_), _))) return #err("IPv4 addresses are not supported in did:web");
             case (#ok((#ipV6(_), _))) return #err("IPv6 addresses are not supported in did:web");
             case (#err(e)) return #err("Invalid domain encoding: " # e);

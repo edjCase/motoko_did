@@ -256,7 +256,7 @@ test(
     testDid(
       "did:web:localhost%3A8080",
       #web({
-        host = #localhost;
+        host = #hostname("localhost");
         port = ?8080;
         path = [];
       }),
