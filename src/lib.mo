@@ -2,11 +2,15 @@ import Result "mo:new-base/Result";
 import Text "mo:new-base/Text";
 import Iter "mo:new-base/Iter";
 import Array "mo:new-base/Array";
-import Key "Key";
-import Plc "Plc";
-import Web "Web";
+import KeyModule "Key";
+import PlcModule "Plc";
+import WebModule "Web";
 
 module {
+
+    public let Web = WebModule;
+    public let Key = KeyModule;
+    public let Plc = PlcModule;
 
     /// Represents a Decentralized Identifier that can be any supported method type.
     ///
@@ -24,9 +28,9 @@ module {
     /// });
     /// ```
     public type DID = {
-        #key : Key.DID;
-        #plc : Plc.DID;
-        #web : Web.DID;
+        #key : KeyModule.DID;
+        #plc : PlcModule.DID;
+        #web : WebModule.DID;
     };
 
     /// Converts a DID to its text representation.
@@ -41,9 +45,9 @@ module {
     /// ```
     public func toText(did : DID) : Text {
         switch (did) {
-            case (#key(keyDid)) Key.toText(keyDid, #base58btc);
-            case (#plc(plcDid)) Plc.toText(plcDid);
-            case (#web(webDid)) Web.toText(webDid);
+            case (#key(keyDid)) KeyModule.toText(keyDid, #base58btc);
+            case (#plc(plcDid)) PlcModule.toText(plcDid);
+            case (#web(webDid)) WebModule.toText(webDid);
         };
     };
 
@@ -76,20 +80,20 @@ module {
         switch (method) {
             case ("key") {
                 Result.chain(
-                    Key.fromText(fullIdentifier),
-                    func(keyDid : Key.DID) : Result.Result<DID, Text> = #ok(#key(keyDid)),
+                    KeyModule.fromText(fullIdentifier),
+                    func(keyDid : KeyModule.DID) : Result.Result<DID, Text> = #ok(#key(keyDid)),
                 );
             };
             case ("plc") {
                 Result.chain(
-                    Plc.fromText(fullIdentifier),
-                    func(plcDid : Plc.DID) : Result.Result<DID, Text> = #ok(#plc(plcDid)),
+                    PlcModule.fromText(fullIdentifier),
+                    func(plcDid : PlcModule.DID) : Result.Result<DID, Text> = #ok(#plc(plcDid)),
                 );
             };
             case ("web") {
                 Result.chain(
-                    Web.fromText(fullIdentifier),
-                    func(webDid : Web.DID) : Result.Result<DID, Text> = #ok(#web(webDid)),
+                    WebModule.fromText(fullIdentifier),
+                    func(webDid : WebModule.DID) : Result.Result<DID, Text> = #ok(#web(webDid)),
                 );
             };
             case (_) {
@@ -108,9 +112,9 @@ module {
     /// ```
     public func equal(did1 : DID, did2 : DID) : Bool {
         switch (did1, did2) {
-            case (#key(k1), #key(k2)) Key.equal(k1, k2);
-            case (#plc(p1), #plc(p2)) Plc.equal(p1, p2);
-            case (#web(w1), #web(w2)) Web.equal(w1, w2);
+            case (#key(k1), #key(k2)) KeyModule.equal(k1, k2);
+            case (#plc(p1), #plc(p2)) PlcModule.equal(p1, p2);
+            case (#web(w1), #web(w2)) WebModule.equal(w1, w2);
             case (_, _) false;
         };
     };
