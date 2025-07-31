@@ -1,9 +1,9 @@
 import DID "../src";
-import Debug "mo:base/Debug";
-import Text "mo:new-base/Text";
-import VarArray "mo:new-base/VarArray";
-import Array "mo:new-base/Array";
+import Text "mo:core/Text";
+import VarArray "mo:core/VarArray";
+import Array "mo:core/Array";
 import { test } "mo:test";
+import Runtime "mo:core/Runtime";
 
 func testDid(
   expectedText : Text,
@@ -21,7 +21,7 @@ func testDidToText(
   let actualText = DID.toText(did);
 
   if (actualText != expectedText) {
-    Debug.trap(
+    Runtime.trap(
       "Text encoding mismatch for DID" #
       "\nExpected: " # debug_show (expectedText) #
       "\nActual:   " # debug_show (actualText)
@@ -35,11 +35,11 @@ func testDidFromText(
 ) {
   let actualDid = switch (DID.fromText(text)) {
     case (#ok(did)) did;
-    case (#err(e)) Debug.trap("fromText failed for '" # text # "': " # debug_show (e));
+    case (#err(e)) Runtime.trap("fromText failed for '" # text # "': " # debug_show (e));
   };
 
   if (actualDid != expectedDid) {
-    Debug.trap(
+    Runtime.trap(
       "Parsing mismatch for '" # text # "'" #
       "\nExpected: " # debug_show (expectedDid) #
       "\nActual:   " # debug_show (actualDid)
@@ -50,13 +50,13 @@ func testDidFromText(
 func testDidRoundtrip(originalText : Text) {
   let parsed = switch (DID.fromText(originalText)) {
     case (#ok(did)) did;
-    case (#err(e)) Debug.trap("Round-trip parse failed for '" # originalText # "': " # debug_show (e));
+    case (#err(e)) Runtime.trap("Round-trip parse failed for '" # originalText # "': " # debug_show (e));
   };
 
   let regenerated = DID.toText(parsed);
 
   if (regenerated != originalText) {
-    Debug.trap(
+    Runtime.trap(
       "Round-trip mismatch for '" # originalText # "'" #
       "\nOriginal:    " # debug_show (originalText) #
       "\nRegenerated: " # debug_show (regenerated)
@@ -66,7 +66,7 @@ func testDidRoundtrip(originalText : Text) {
 
 func testDidError(invalidText : Text) {
   switch (DID.fromText(invalidText)) {
-    case (#ok(did)) Debug.trap("Expected error for '" # invalidText # "' but got: " # debug_show (did));
+    case (#ok(did)) Runtime.trap("Expected error for '" # invalidText # "' but got: " # debug_show (did));
     case (#err(_)) {};
   };
 };
