@@ -1,5 +1,5 @@
-import Result "mo:core/Result";
-import Text "mo:core/Text";
+import Result "mo:core@1/Result";
+import Text "mo:core@1/Text";
 
 module {
 

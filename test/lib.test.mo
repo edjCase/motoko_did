@@ -1,9 +1,9 @@
 import DID "../src";
-import Text "mo:core/Text";
-import VarArray "mo:core/VarArray";
-import Array "mo:core/Array";
+import Text "mo:core@1/Text";
+import VarArray "mo:core@1/VarArray";
+import Array "mo:core@1/Array";
 import { test } "mo:test";
-import Runtime "mo:core/Runtime";
+import Runtime "mo:core@1/Runtime";
 
 func testDid(
   expectedText : Text,

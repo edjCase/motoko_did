@@ -1,12 +1,12 @@
-import Result "mo:core/Result";
-import Iter "mo:core/Iter";
-import Blob "mo:core/Blob";
-import Text "mo:core/Text";
-import Nat8 "mo:core/Nat8";
-import Buffer "mo:buffer";
-import MultiCodec "mo:multiformats/MultiCodec";
-import MultiBase "mo:multiformats/MultiBase";
-import List "mo:core/List";
+import Result "mo:core@1/Result";
+import Iter "mo:core@1/Iter";
+import Blob "mo:core@1/Blob";
+import Text "mo:core@1/Text";
+import Nat8 "mo:core@1/Nat8";
+import Buffer "mo:buffer@0";
+import MultiCodec "mo:multiformats@2/MultiCodec";
+import MultiBase "mo:multiformats@2/MultiBase";
+import List "mo:core@1/List";
 
 module {
 

@@ -1,15 +1,16 @@
 [package]
 name = "did"
-version = "2.0.2"
+version = "2.1.0"
 description = "A motoko library for working with Decentralized Identifiers (DIDs)"
 repository = "https://github.com/edjcase/motoko_did"
 keywords = ["did", "decentralized", "identifiers", "ipld", "atproto"]
 license = "MIT"
 
 [dependencies]
-core = "0.6.0"
-multiformats = "2.0.1"
-url-kit = "1.0.1"
+"core@1" = "1.0.0"
+"multiformats@2" = "2.1.0"
+"url-kit@1" = "1.1.0"
+"buffer@0" = "0.1.0"
 
 [dev-dependencies]
 test = "2.1.1"

@@ -1,12 +1,12 @@
-import Result "mo:core/Result";
-import Text "mo:core/Text";
-import Array "mo:core/Array";
-import Iter "mo:core/Iter";
-import UrlKit "mo:url-kit";
-import Host "mo:url-kit/Host";
-import Path "mo:url-kit/Path";
-import Domain "mo:url-kit/Domain";
-import List "mo:core/List";
+import Result "mo:core@1/Result";
+import Text "mo:core@1/Text";
+import Array "mo:core@1/Array";
+import Iter "mo:core@1/Iter";
+import UrlKit "mo:url-kit@1";
+import Host "mo:url-kit@1/Host";
+import Path "mo:url-kit@1/Path";
+import Domain "mo:url-kit@1/Domain";
+import List "mo:core@1/List";
 
 module {
 

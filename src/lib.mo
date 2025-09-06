@@ -1,7 +1,7 @@
-import Result "mo:core/Result";
-import Text "mo:core/Text";
-import Iter "mo:core/Iter";
-import Array "mo:core/Array";
+import Result "mo:core@1/Result";
+import Text "mo:core@1/Text";
+import Iter "mo:core@1/Iter";
+import Array "mo:core@1/Array";
 import KeyModule "Key";
 import PlcModule "Plc";
 import WebModule "Web";
