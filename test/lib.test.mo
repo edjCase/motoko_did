@@ -161,16 +161,12 @@ test(
 // =============================================================================
 
 test(
-  "did:web - Simple Domain",
+  "did:web - Simple Hostname",
   func() {
     testDid(
       "did:web:example.com",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "example";
-          suffix = "com";
-        });
+        hostname = "example.com";
         path = [];
         port = null;
       }),
@@ -179,16 +175,12 @@ test(
 );
 
 test(
-  "did:web - Domain with Single Path",
+  "did:web - Hostname with Single Path",
   func() {
     testDid(
       "did:web:example.com:user",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "example";
-          suffix = "com";
-        });
+        hostname = "example.com";
         path = ["user"];
         port = null;
       }),
@@ -197,16 +189,12 @@ test(
 );
 
 test(
-  "did:web - Domain with Multiple Path Segments",
+  "did:web - Hostname with Multiple Path Segments",
   func() {
     testDid(
       "did:web:example.com:users:alice",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "example";
-          suffix = "com";
-        });
+        hostname = "example.com";
         path = ["users", "alice"];
         port = null;
       }),
@@ -220,11 +208,7 @@ test(
     testDid(
       "did:web:identity.foundation",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "identity";
-          suffix = "foundation";
-        });
+        hostname = "identity.foundation";
         path = [];
         port = null;
       }),
@@ -238,11 +222,7 @@ test(
     testDid(
       "did:web:example.com:accounts:corporate:acme-corp",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "example";
-          suffix = "com";
-        });
+        hostname = "example.com";
         path = ["accounts", "corporate", "acme-corp"];
         port = null;
       }),
@@ -251,12 +231,12 @@ test(
 );
 
 test(
-  "did:web - Port Number in Domain",
+  "did:web - Port Number in Host",
   func() {
     testDid(
       "did:web:localhost%3A8080",
       #web({
-        host = #hostname("localhost");
+        hostname = "localhost";
         port = ?8080;
         path = [];
       }),
@@ -270,11 +250,7 @@ test(
     testDid(
       "did:web:example.com:path%20with%20spaces",
       #web({
-        host = #domain({
-          subdomains = [];
-          name = "example";
-          suffix = "com";
-        });
+        hostname = "example.com";
         path = ["path with spaces"];
         port = null;
       }),

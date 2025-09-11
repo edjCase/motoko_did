@@ -23,8 +23,9 @@ module {
   ///   identifier = "abc123def456";
   /// });
   /// let didWeb : DID = #web({
-  ///   domain = "example.com";
-  ///   path = ?["users", "alice"];
+  ///   hostname = "example.com";
+  ///   port = null;
+  ///   path = ["users", "alice"];
   /// });
   /// ```
   public type DID = {

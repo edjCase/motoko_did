@@ -21,9 +21,9 @@ Decentralized Identifiers (DIDs) are a type of identifier that enables verifiabl
 
 This library supports three DID methods:
 
-- **did:key** - Cryptographic key-based identifiers that encode public keys directly
-- **did:plc** - Public Ledger of Credentials identifiers used in AT Protocol
-- **did:web** - Web-based identifiers that resolve to DID documents over HTTPS
+-   **did:key** - Cryptographic key-based identifiers that encode public keys directly
+-   **did:plc** - Public Ledger of Credentials identifiers used in AT Protocol
+-   **did:web** - Web-based identifiers that resolve to DID documents over HTTPS
 
 ## Quick Start
 
@@ -64,16 +64,9 @@ let text = DID.toText(didPLC);
 
 ```motoko
 import DID "mo:did";
-import Domain "mo:url-kit/Domain";
-
-// Create a did:web identifier
-let domain = switch (Domain.fromText("example.com")) {
-  case (#ok(domain)) domain;
-  case (#err(e)) Debug.trap("Invalid domain: " # e);
-};
 
 let didWeb : DID.DID = #web({
-  host = #domain(domain);
+  hostname = "example.com";
   port = null;
   path = ["users", "alice"];
 });
@@ -134,7 +127,7 @@ public type Plc.DID = {
 
 // did:web specific types
 public type Web.DID = {
-  host : Host;
+  hostname : Text;
   port : ?Nat16;
   path : [Text];
 };
@@ -191,8 +184,8 @@ public func Web.toText(did : Web.DID) : Text;
 // Parse did:web from text
 public func Web.fromText(text : Text) : Result.Result<Web.DID, Text>;
 
-// Create did:web from domain and path
-public func Web.fromDomainAndPath(domain : Text, path : [Text]) : Result.Result<Web.DID, Text>;
+// Create did:web from hostname and path
+public func Web.fromHostnameAndPath(hostname : Text, path : [Text]) : Result.Result<Web.DID, Text>;
 
 // Get HTTPS URL for DID document resolution
 public func Web.toHttpsUrl(did : Web.DID) : Text;
@@ -205,9 +198,9 @@ public func Web.equal(did1 : Web.DID, did2 : Web.DID) : Bool;
 
 ### did:key
 
-- **ed25519** - Most common elliptic curve signature system (32 bytes)
-- **secp256k1** - Bitcoin-style elliptic curve (33 bytes compressed)
-- **p256** - NIST P-256 elliptic curve (33 bytes compressed)
+-   **ed25519** - Most common elliptic curve signature system (32 bytes)
+-   **secp256k1** - Bitcoin-style elliptic curve (33 bytes compressed)
+-   **p256** - NIST P-256 elliptic curve (33 bytes compressed)
 
 ## DID Method Specifications
 
@@ -215,26 +208,26 @@ This implementation follows the official DID specifications:
 
 ### did:key
 
-- [W3C DID Key Method Specification](https://w3c-ccg.github.io/did-method-key/)
-- Uses multicodec for key type encoding and multibase (base58btc) for text representation
+-   [W3C DID Key Method Specification](https://w3c-ccg.github.io/did-method-key/)
+-   Uses multicodec for key type encoding and multibase (base58btc) for text representation
 
 ### did:plc
 
-- [AT Protocol PLC Method](https://web.plc.directory/)
-- Used primarily in the AT Protocol ecosystem for decentralized social networking
+-   [AT Protocol PLC Method](https://web.plc.directory/)
+-   Used primarily in the AT Protocol ecosystem for decentralized social networking
 
 ### did:web
 
-- [W3C DID Web Method Specification](https://w3c-ccg.github.io/did-method-web/)
-- Resolves DID documents over HTTPS at `/.well-known/did.json`
+-   [W3C DID Web Method Specification](https://w3c-ccg.github.io/did-method-web/)
+-   Resolves DID documents over HTTPS at `/.well-known/did.json`
 
 ## Dependencies
 
 This library depends on:
 
-- `mo:core` - Core Motoko utilities
-- `mo:multiformats` - Multicodec and multibase encoding
-- `mo:url-kit` - URL and domain parsing utilities
+-   `mo:core` - Core Motoko utilities
+-   `mo:multiformats` - Multicodec and multibase encoding
+-   `mo:url-kit` - URL and host parsing utilities
 
 ## License
 
