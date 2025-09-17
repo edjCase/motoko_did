@@ -150,16 +150,19 @@ public func equal(did1 : DID, did2 : DID) : Bool;
 
 ```motoko
 // Convert did:key to text with specified multibase encoding
-public func Key.toText(did : Key.DID, multibase : MultiBase.MultiBase) : Text;
+public func toText(did : Key.DID, multibase : MultiBase.MultiBase) : Text;
+
+// Convert did:key to text with specified multibase encoding but without the "did:key:" prefix
+public func toTextRaw(did : Key.DID, multibase : MultiBase.MultiBase) : Text;
 
 // Parse did:key from text
-public func Key.fromText(text : Text) : Result.Result<Key.DID, Text>;
+public func fromText(text : Text) : Result.Result<Key.DID, Text>;
 
 // Create did:key from raw public key
-public func Key.fromPublicKey(keyType : KeyType, publicKey : Blob) : Result.Result<Key.DID, Text>;
+public func fromPublicKey(keyType : KeyType, publicKey : Blob) : Result.Result<Key.DID, Text>;
 
 // Check equality
-public func Key.equal(did1 : Key.DID, did2 : Key.DID) : Bool;
+public func equal(did1 : Key.DID, did2 : Key.DID) : Bool;
 ```
 
 ### did:plc Functions

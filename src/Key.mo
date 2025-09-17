@@ -32,7 +32,7 @@ module {
     publicKey : Blob;
   };
 
-  /// Converts a did:key to its text representation using base58btc encoding.
+  /// Converts a did:key to its text representation
   ///
   /// ```motoko
   /// let didKey : DID = {
@@ -43,6 +43,21 @@ module {
   /// // Returns: "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
   /// ```
   public func toText(did : DID, multibase : MultiBase.MultiBase) : Text {
+    let key = toTextRaw(did, multibase);
+    "did:key:" # key;
+  };
+
+  /// Converts a did:key to its raw text representation without the "did:key:" prefix.
+  ///
+  /// ```motoko
+  /// let didKey : DID = {
+  ///   keyType = #ed25519;
+  ///   publicKey = "\E3\B0\C4\42\98\FC\1C\14\9A\FB\F4\C8\99\6F\B9\24\27\AE\41\E4\64\9B\93\4C\A4\95\99\1B\78\52\B8\55";
+  /// };
+  /// let text = Key.toTextRaw(didKey, #base58btc);
+  /// // Returns: "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+  /// ```
+  public func toTextRaw(did : DID, multibase : MultiBase.MultiBase) : Text {
 
     let buffer = List.empty<Nat8>();
 
@@ -58,9 +73,7 @@ module {
       List.add(buffer, byte);
     };
     // Convert to multibase (base58btc) text
-    let key = MultiBase.toText(List.values(buffer), multibase);
-
-    "did:key:" # key;
+    MultiBase.toText(List.values(buffer), multibase);
   };
 
   /// Parses a did:key text string into a DID structure.
